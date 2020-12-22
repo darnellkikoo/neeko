@@ -69,25 +69,15 @@ void popTail (){
     }
 }
 
-void remove(Node *curr) {
-  Node *before = head;
-  Node *after = curr->next;
-  while(before->next != curr) {
-    before = before->next;
-  }
-  before->next = after;
-  free(curr);
-}
-
 void duplicate() {
   Node *curr = head;
     while (curr && curr->next != NULL){
         if (curr->value == curr->next->value){
-            if (curr==head){
-                popHead ();
-            }else{
-                remove (curr);
+          Node *curr2 =curr;
+            while(curr2->value == curr2->next->value) {
+              curr2 = curr2->next;
             }
+            curr->next = curr2->next;
         }
         curr = curr->next;
     }
@@ -114,6 +104,8 @@ int main() {
   pushTail(5);
   pushTail(5);
   pushTail(6);
+  pushHead(0);
+  pushHead(0);
 
   printf("Before removing the duplicate(s):\n");
   printLinkedList();
