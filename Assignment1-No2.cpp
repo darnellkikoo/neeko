@@ -10,7 +10,7 @@ struct Node {
 Node *createNode(int ele) {
   Node *newNode = (Node*)malloc(sizeof(Node));
   newNode->ele = ele;
-  newnode->flag = 0;
+  newNode->flag = 0;
   newNode->next = NULL;
   return newNode;
 }
@@ -25,10 +25,21 @@ void pushTail(int ele) {
   }
 }
 
+void printLinkedList() {
+  Node *curr = head;
+  while(curr) {
+    printf("%d -> ", curr->ele);
+    curr = curr->next;
+  }
+  printf("NULL\n");
+}
 
 int main() {
   int boolean = 0;
   //assume linked list = node;
+  pushTail(3);
+  pushTail(4);
+  pushTail(5);
   Node *curr = head;
 
   // linked-list cycle check
@@ -41,6 +52,7 @@ int main() {
     }
     curr = curr->next;
   }
+  printLinkedList();
   if(boolean == 1) {
     printf("This LinkedList has a cycle\n");
   } else {
