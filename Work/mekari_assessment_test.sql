@@ -64,13 +64,23 @@ with fact_timesheets as
   from fact_working_hours
   group by 1,2
 )
+, latest_employee_attendance as
+( /* if the employee has not resigned, we will count the latest time they attended as their total working month */
+  select
+    employee_id
+    , max(date) latest_attendance_date
+  from fact_timesheets
+  group by 1
+)
 , fact_employees as
 ( /* get all employees data */
-  select * except(employe_id)
+  select e.* except(employe_id)
   , employe_id employee_id
-  /* clean data for resign date is null, we assume they are still working until today */
-  , date_diff(coalesce(resign_date, date(current_date('Asia/Jakarta'))),join_date, month) total_months_worked
-  from `sandbox_bi.employees`
+  /* clean data for resign date is null, we assume they are still working until latest date of the attendance on timesheets */
+  , date_diff(coalesce(resign_date, l.latest_attendance_date),join_date, month) total_months_worked
+  from `sandbox_bi.employees` e
+  left join latest_employee_attendance l
+    on e.employe_id = l.employee_id
   /* there is 1 employee id in the table that has duplicate values. will take the one with the highest salary */
   /* sample id 218078 */
   qualify row_number() over(partition by employe_id order by salary desc) = 1
@@ -85,6 +95,7 @@ with fact_timesheets as
 )
   select *
   from summary_employees_working_salary
+
 /* duplicate check
   select employee_id, working_month, count(1) c
   from summary_employees_working_salary
